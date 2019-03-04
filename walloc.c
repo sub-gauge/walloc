@@ -60,12 +60,12 @@ void *walloc(size_t size)
         p = find_block(first_block, size);
         if(p)
         {
-
+            p -> free = 1;
         }
         else
         {
             first_block = extend_heap(first_block, size);
-            p = first_block
+            p = first_block;
             if(!p)
             {
                 return NULL;
@@ -74,8 +74,8 @@ void *walloc(size_t size)
     }
     else
     {
-        first_block = extend_heap(p, size);
-        return first_block -> date;
+        first_block = extend_heap(NULL, size);
+        p = first_block;
     }
     return p -> date;
 }
