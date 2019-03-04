@@ -11,18 +11,16 @@ struct block
 };
 
 
-void *first_block = NULL;
+struct block *first_block = NULL;
 
 //扩展堆
-struct block *extend_heap(struct block *last, size_t s) {
+struct block *extend_heap(struct block *first, size_t s) {
     struct block *b;
     b = sbrk(0);
     if(sbrk(24 + s) == (void *)-1)
         return NULL;
     b -> size = s;
-    b -> next = NULL;
-    if(last)
-        last->next = b;
+    b -> next = first;
     b -> free = 1;
     return b;
 }
@@ -36,13 +34,14 @@ size_t align(size_t a) {
 
 struct block *find_block(struct block *p, size_t size)
 {
-    while( (p == NULL) && (p -> free == 0) )
+    while(p != NULL)
     {
-        if(p -> size >= size)
+        if(p -> size >= size && p -> free == 0)
         {
             p -> free = 1;
-            return p -> date;
+            return p;
         }
+        p = p -> next;
     }
 }
 
@@ -60,7 +59,7 @@ void *walloc(size_t size)
         p = find_block(first_block, size);
         if(p)
         {
-            p -> free = 1;
+
         }
         else
         {
@@ -74,8 +73,9 @@ void *walloc(size_t size)
     }
     else
     {
-        first_block = extend_heap(NULL, size);
-        p = first_block;
+        first_block = extend_heap(p, size);
+        return first_block -> date;
     }
-    return p -> date;
+    return (void *)(p -> date);
 }
+
